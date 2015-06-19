@@ -17,11 +17,25 @@ public class Calculator : MonoBehaviour {
 	private bool readyForNewQuantity = true;
 
 
+	#region Set-up and teardown
+
 	void OnEnable()
 	{
 		InitCalc();
 	}
 
+
+	void InitCalc()
+	{
+		displayText.text = "0";
+		memoryQuantity = null;
+		memoryOperation = "";
+		readyForNewQuantity = true;
+	}
+	#endregion
+
+
+	#region Process operations
 
 	public void RegisterButtonPress(CalcButton button)
 	{
@@ -87,25 +101,31 @@ public class Calculator : MonoBehaviour {
 			}
 
 			
-			// TODO: make sure to handle cases when the result is huge (e.g. 1.2342E+18)
+			// Handles cases when the result is huge or very small (e.g. 1.2342E+18)
 			if (displayText.text.Contains("E") && displayText.text.Contains("."))
 			{
+				// Make a temp variable to hold the new display quantity.
 				string newDisplay = "";
 
 
+				// If there are enough digits between the decimal point and the E, ...
 				if (displayText.text.IndexOf("E") - displayText.text.IndexOf(".") > 5)
 				{
+					// ...take the whole number, decimal, and 5 decimal places, ...
 					newDisplay += displayText.text.Substring(0, 7);
+					// ...and append the E and everything after.
 					newDisplay += displayText.text.Substring(displayText.text.IndexOf("E"));
 				}
 				else
 					newDisplay = displayText.text;
 
 				
+				// Set the text on screen to the temp variable.
 				displayText.text = newDisplay;
 			}
 
 
+			// After pressing ANY operation button, the calculator expects the user to start on a new quantity.
 			readyForNewQuantity = true;
 		}
 		// If it's a decimal point button...
@@ -126,15 +146,6 @@ public class Calculator : MonoBehaviour {
 
 
 		lastButtonPressed = button.name;
-	}
-
-
-	void InitCalc()
-	{
-		displayText.text = "0";
-		memoryQuantity = null;
-		memoryOperation = "";
-		readyForNewQuantity = true;
 	}
 
 	
@@ -180,4 +191,5 @@ public class Calculator : MonoBehaviour {
 	{
 		return double.Parse(displayText.text, System.Globalization.CultureInfo.InvariantCulture.NumberFormat);
 	}
+	#endregion
 }

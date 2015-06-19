@@ -14,18 +14,23 @@ namespace Phone
 
 		public int numberOfScreens = 3;
 		public float xFirstPage, xLastPage;
-		public RectTransform homeScreensRect;
+		public RectTransform homeScreensRect;			// Each home screen page is a child within this wider rect.
 		
 		
-		private float valueChangeForNextScreen;
+		private float xChangeForNextScreen;
 
 
 		void OnEnable()
 		{
 			if (numberOfScreens > 1)
-				valueChangeForNextScreen = (xLastPage - xFirstPage) / (float)(numberOfScreens - 1);
+				xChangeForNextScreen = (xLastPage - xFirstPage) / (float)(numberOfScreens - 1);
 			else
-				valueChangeForNextScreen = xLastPage - xFirstPage;
+			{
+#if UNITY_EDITOR
+				Debug.Log("HomeScroller.numberOfScreens set too low. Script not necessary (consider disabling it).");
+#endif
+				xChangeForNextScreen = xLastPage - xFirstPage;
+			}
 		}
 
 
@@ -59,8 +64,8 @@ namespace Phone
 
 		bool DoesValueCorrespondToScreen(int screen)
 		{
-			if (homeScreensRect.anchoredPosition.x < ValueForCenterOfScreen(screen) - valueChangeForNextScreen / 2f &&
-				homeScreensRect.anchoredPosition.x >= ValueForCenterOfScreen(screen) + valueChangeForNextScreen / 2f)
+			if (homeScreensRect.anchoredPosition.x < ValueForCenterOfScreen(screen) - xChangeForNextScreen / 2f &&
+				homeScreensRect.anchoredPosition.x >= ValueForCenterOfScreen(screen) + xChangeForNextScreen / 2f)
 				return true;
 
 			Debug.Log("DoesValueCorrespondToScreen(" + screen.ToString() + ") returned false.");
