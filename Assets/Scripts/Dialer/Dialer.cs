@@ -2,12 +2,15 @@
 using UnityEngine.UI;
 using System.Collections;
 
-public class Dialer : MonoBehaviour 
+public class Dialer : Phone.App 
 {
+	public enum ButtonType { Symbol, Action, Number };
+	
+	
 	public Text displayText;
 	public Text callingText;
 	public GameObject callingScreen;
-	public enum ButtonType { Symbol, Action, Number };
+	
 	
 	private int maxCharacters = 13;
 
@@ -40,7 +43,7 @@ public class Dialer : MonoBehaviour
 				return;
 			}
 			// if however the display does not contain * or #...
-			else if (!(displayText.text.Contains ("*") || displayText.text.Contains("#")))
+			else
 			{
 				// if a number button is pressed that results in the display text length
 				// being longer than 3...
@@ -180,6 +183,10 @@ public class Dialer : MonoBehaviour
 			}
 		}
 	}
-		
 
+	#region Save file manipulation
+
+	protected override void LoadSaveFile() { Debug.Log("Dialer.LoadSaveFile() not implemented"); }
+	protected override void UpdateSaveFile() { Debug.Log("Dialer.UpdateSaveFile() not implemented"); }
+	#endregion
 }
