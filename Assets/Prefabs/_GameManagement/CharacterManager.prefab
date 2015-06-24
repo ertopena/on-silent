@@ -1,0 +1,111 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &109124
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 475130}
+  - 114: {fileID: 11499826}
+  m_Layer: 0
+  m_Name: CharacterManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &475130
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 109124}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+--- !u!114 &11499826
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 109124}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c76e8f7cf5675c441b687c86511eb903, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characters:
+  - tag: 0
+    firstName: Les
+    lastName: 
+    alias: Me
+    picture: {fileID: 0}
+    phoneNumber: 0
+  - tag: 1
+    firstName: Jess
+    lastName: Bradley
+    alias: 
+    picture: {fileID: 0}
+    phoneNumber: 0
+  - tag: 2
+    firstName: Rick
+    lastName: Dunn
+    alias: 
+    picture: {fileID: 0}
+    phoneNumber: 0
+  - tag: 3
+    firstName: 
+    lastName: 
+    alias: Bitch
+    picture: {fileID: 0}
+    phoneNumber: 0
+  - tag: 4
+    firstName: 
+    lastName: 
+    alias: Ellen
+    picture: {fileID: 0}
+    phoneNumber: 0
+  - tag: 5
+    firstName: 
+    lastName: 
+    alias: Work Mike
+    picture: {fileID: 0}
+    phoneNumber: 0
+  - tag: 6
+    firstName: 
+    lastName: 
+    alias: Burritos Locos
+    picture: {fileID: 0}
+    phoneNumber: 0
+  - tag: 7
+    firstName: 
+    lastName: 
+    alias: KQAL
+    picture: {fileID: 0}
+    phoneNumber: 0
+  - tag: 8
+    firstName: 
+    lastName: 
+    alias: Office
+    picture: {fileID: 0}
+    phoneNumber: 0
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: characters.Array.data[0].phoneNumber
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 109124}
+  m_IsPrefabParent: 1
