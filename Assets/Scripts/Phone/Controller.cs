@@ -42,6 +42,7 @@ namespace Phone
 		public Calculator calculator;
 		public Texts.TextsApp texts;
 		public AppLoader appLoader;
+		public Dialer dialer;
 		
 
 		void Start()

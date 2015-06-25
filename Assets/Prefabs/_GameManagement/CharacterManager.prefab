@@ -41,54 +41,60 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characters:
   - tag: 0
-    firstName: Les
+    firstName: 
     lastName: 
     alias: Me
     picture: {fileID: 0}
     phoneNumber: 0
   - tag: 1
+    firstName: 
+    lastName: 
+    alias: Les
+    picture: {fileID: 0}
+    phoneNumber: 0
+  - tag: 2
     firstName: Jess
     lastName: Bradley
     alias: 
     picture: {fileID: 0}
     phoneNumber: 0
-  - tag: 2
+  - tag: 3
     firstName: Rick
     lastName: Dunn
     alias: 
     picture: {fileID: 0}
     phoneNumber: 0
-  - tag: 3
+  - tag: 4
     firstName: 
     lastName: 
     alias: Bitch
     picture: {fileID: 0}
     phoneNumber: 0
-  - tag: 4
+  - tag: 5
     firstName: 
     lastName: 
     alias: Ellen
     picture: {fileID: 0}
     phoneNumber: 0
-  - tag: 5
+  - tag: 6
     firstName: 
     lastName: 
     alias: Work Mike
     picture: {fileID: 0}
     phoneNumber: 0
-  - tag: 6
+  - tag: 7
     firstName: 
     lastName: 
     alias: Burritos Locos
     picture: {fileID: 0}
     phoneNumber: 0
-  - tag: 7
+  - tag: 8
     firstName: 
     lastName: 
     alias: KQAL
     picture: {fileID: 0}
     phoneNumber: 0
-  - tag: 8
+  - tag: 9
     firstName: 
     lastName: 
     alias: Office

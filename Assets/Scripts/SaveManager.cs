@@ -5,6 +5,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.IO;
 
+#region SaveFile class
 
 [System.Serializable]
 [XmlRoot("savefile")]
@@ -38,6 +39,7 @@ public class SaveFile
 		return container;
 	}
 }
+#endregion
 
 
 public class SaveManager : MonoBehaviour
@@ -50,6 +52,7 @@ public class SaveManager : MonoBehaviour
 
 
 	public SaveFile saveFile;		// TODO: Once we have a blankSaveFile prepared, make this {get; private set;}
+	public bool allowSaveTemplateEdits = false;
 
 
 	Phone.Controller gameController;
@@ -69,8 +72,15 @@ public class SaveManager : MonoBehaviour
 			Destroy(this.gameObject);
 
 
+#if UNITY_EDITOR
+		savePath = Path.Combine(Application.dataPath, "Resources/save.xml");
+#else
 		savePath = Path.Combine(Application.persistentDataPath, "save.xml");
-		blankSavePath = Path.Combine(Application.dataPath, "blankSave.xml");
+#endif
+		blankSavePath = Path.Combine(Application.dataPath, "Resources/blankSave.xml");
+
+
+		InitSaveFile();
 	}
 
 
@@ -86,7 +96,7 @@ public class SaveManager : MonoBehaviour
 	}
 
 
-	void Start()
+	void InitSaveFile()
 	{
 		if (File.Exists(savePath))
 			saveFile = SaveFile.Load(savePath);
@@ -114,27 +124,32 @@ public class SaveManager : MonoBehaviour
 
 	void Update()
 	{
-		CheckToEditSaveStructure();
+		if (allowSaveTemplateEdits)
+			CheckToEditSaveTemplates();
 	}
 
 
 	#region Runtime save file manipulation
 
+	public void Save(string path) { saveFile.Save(path); }
+	public void Save() { Save(savePath); }
 	public void Save(Phone.App app)
 	{
 		if (app.YieldSaveControl())
 		{
 			SaveAppProgress();
-			saveFile.Save(savePath);
+			Save();
 		}
+		else
+			Debug.LogError(app.type.ToString() + " failed to yield save control.");
 	}
 	#endregion
 
 
-	#region Editor-time save file manipulation
+	#region Editor-time save template manipulation
 
 	// Reads inputs to see whether to change the save file and/or the blank save file.
-	void CheckToEditSaveStructure()
+	void CheckToEditSaveTemplates()
 	{
 		if (Input.GetKeyUp(KeyCode.Alpha0))
 			WipeSaveFile();
@@ -144,6 +159,9 @@ public class SaveManager : MonoBehaviour
 
 		if (Input.GetKeyUp(KeyCode.R))
 			ResetSaveFile();
+
+		if (Input.GetKeyUp(KeyCode.S))
+			CreateTestSaveFile();
 	}
 
 
@@ -164,7 +182,14 @@ public class SaveManager : MonoBehaviour
 	void CreateNewBlankSaveFile()
 	{
 		PopulateSaveFile();
-		saveFile.Save(blankSavePath);
+		Save(blankSavePath);
+	}
+
+
+	void CreateTestSaveFile()
+	{
+		PopulateSaveFile();
+		Save();
 	}
 
 
@@ -176,9 +201,10 @@ public class SaveManager : MonoBehaviour
 
 		if (gameController != null)
 		{
-			// Populate Conversations.
-
+			saveFile.conversations = gameController.texts.GetConvosInProgress();
 		}
+		else
+			Debug.LogError("SaveManager could not get a Phone.Controller script to update the saveFile.");
 	}
 
 

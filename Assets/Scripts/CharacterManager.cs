@@ -4,7 +4,7 @@ using System.Collections;
 [System.Serializable]
 public class Character
 {
-	public enum ID { Les, Jess, Rick, Bitch, Ellen, Mike, Burritos, KQAL, Office };
+	public enum ID { Owner, Les, Jess, Rick, Bitch, Ellen, Mike, Burritos, KQAL, Office };
 
 
 	public ID tag;

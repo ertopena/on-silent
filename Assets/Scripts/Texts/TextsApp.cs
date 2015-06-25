@@ -22,7 +22,6 @@ namespace Texts
 
 		void Start()
 		{
-			
 			if (buildFromSaveFile)
 				PopulateApp();
 		}
@@ -51,6 +50,10 @@ namespace Texts
 
 			// Create a new array to hold the new conversation windows.
 			activeConvoBuilders = new ConversationBuilder[convosInProgress.Count];
+
+
+			// Arrange the conversations by date of the most recent message.
+			convosInProgress.Sort();
 
 
 			// For each convo tracked by the save file, ...
@@ -105,28 +108,7 @@ namespace Texts
 
 		#region SaveFile operations
 
-		protected override void LoadSaveFile()
-		{
-			/*
-			if (SaveManager.Current != null)
-			{
-				convosInProgress = new Conversation[SaveManager.Current.saveFile.conversations.Count];
-				SaveManager.Current.saveFile.conversations.CopyTo(convosInProgress, 0);
-			}
-			else
-				Debug.LogError("SaveManager.Current is null. TextsApp could not complete LoadSaveFile()");
-			*/
-			if (SaveManager.Current != null)
-				convosInProgress = SaveManager.Current.saveFile.conversations;
-			else
-			{
-				Debug.LogError("SaveManager.Current is null. TextsApp could not complete LoadSaveFile()");
-				convosInProgress = new List<Conversation>();
-			}
-		}
-
-
-		protected override void UpdateSaveFile()
+		public List<Conversation> GetConvosInProgress()
 		{
 			// Make a container for the conversations going on.
 			List<Conversation> newConvos = new List<Conversation>();
@@ -139,8 +121,25 @@ namespace Texts
 			}
 
 
-			// Change the saveFile's conversations to the temporary pointer.
-			SaveManager.Current.saveFile.conversations = newConvos;
+			return newConvos;
+		}
+
+		
+		protected override void LoadSaveFile()
+		{
+			if (SaveManager.Current != null)
+				convosInProgress = SaveManager.Current.saveFile.conversations;
+			else
+			{
+				Debug.LogError("SaveManager.Current is null. TextsApp could not complete LoadSaveFile()");
+				convosInProgress = new List<Conversation>();
+			}
+		}
+
+
+		protected override void UpdateSaveFile()
+		{
+			SaveManager.Current.saveFile.conversations = GetConvosInProgress();
 		}
 		#endregion
 	}
