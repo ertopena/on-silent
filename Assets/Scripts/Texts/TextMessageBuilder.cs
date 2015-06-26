@@ -29,6 +29,9 @@ namespace Texts
 		// Compares the text messages by date.
 		public int CompareTo(TextMessage other)
 		{
+			if (other == null)
+				return 1;
+			
 			return this.timestamp.CompareTo(other.timestamp);
 		}
 	}

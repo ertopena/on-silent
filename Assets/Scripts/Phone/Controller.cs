@@ -36,8 +36,11 @@ namespace Phone
 	{
 		public delegate void ControllerEvent(Controller ctrl);
 		public static event ControllerEvent OnControllerStart;
+		public delegate void GameEvent();
+		public delegate void AppEvent(App app);
 
 
+		public bool AllowingInput { get; private set; }
 		public Image phoneBG;
 		public Calculator calculator;
 		public Texts.TextsApp texts;
@@ -45,10 +48,45 @@ namespace Phone
 		public Dialer dialer;
 		
 
+		void Awake()
+		{
+			AllowingInput = true;
+		}
+
+
+		void OnEnable()
+		{
+			texts.OnAnimStart += SuspendInput;
+			texts.OnAnimEnd += ResumeInput;
+		}
+
+
+		void OnDisable()
+		{
+			texts.OnAnimStart -= SuspendInput;
+			texts.OnAnimEnd -= ResumeInput;
+		}
+
+
 		void Start()
 		{
 			if (OnControllerStart != null)
 				OnControllerStart(this);
 		}
+
+
+		#region Game flow
+
+		void SuspendInput()
+		{
+			AllowingInput = false;
+		}
+
+
+		void ResumeInput()
+		{
+			AllowingInput = true;
+		}
+		#endregion
 	}
 }

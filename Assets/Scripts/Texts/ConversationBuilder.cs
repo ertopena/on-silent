@@ -8,12 +8,40 @@ using System.Xml.Serialization;
 namespace Texts
 {
 	[System.Serializable]
-	public class Conversation
+	public class Conversation : System.IComparable<Conversation>
 	{
 		public Character.ID characterID;
 		[XmlArray("msgBuilders")]
 		[XmlArrayItem("msg")]
 		public List<TextMessage> textMessages = new List<TextMessage>();
+
+
+		public int CompareTo(Conversation other)
+		{
+			if (other == null)
+				return 1;
+			
+			return this.GetLatestTextMessage().CompareTo(other.GetLatestTextMessage());
+		}
+
+
+		public TextMessage GetLatestTextMessage()
+		{
+			TextMessage lastText = new TextMessage();
+
+			if (textMessages != null && textMessages.Count > 0)
+			{
+				lastText = textMessages[0];
+				
+				foreach (TextMessage txt in textMessages)
+				{
+					if (txt.CompareTo(lastText) > 0)
+						lastText = txt;
+				}
+			}
+
+			return lastText;
+		}
 	}
 
  
@@ -68,6 +96,7 @@ namespace Texts
 		}
 
 
+		// NOTE: Should this be implemented using Conversation.GetLatestTextMessage()?
 		public TextMessage GetLastText()
 		{
 			TextMessage[] m = ExportPackage().textMessages.ToArray();
@@ -87,6 +116,7 @@ namespace Texts
 			box.GetComponent<TextMessageBuilder>().Build(msg);
 
 
+			// Accommodate the new message in the scrollview if needed.
 			if (resizeScrollView)
 				ResizeScrollView();
 		}

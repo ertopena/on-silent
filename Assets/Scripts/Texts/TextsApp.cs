@@ -7,21 +7,59 @@ namespace Texts
 {
 	public class TextsApp : Phone.App
 	{
+		public event Phone.Controller.GameEvent OnAnimStart;
+		public event Phone.Controller.GameEvent OnAnimEnd;
+
+		
 		public bool buildFromSaveFile = false;
 		public RectTransform contactScrollView;
 		public GameObject contactBoxPrefab;
 		public ContactBox[] activeContactBoxes;
+		public RectTransform convoHolder;
 		public GameObject convoBuilderPrefab;
 		public ConversationBuilder[] activeConvoBuilders;
+		public SignpostText signpostText;
+		public RectTransform convoRenderingArea;
+		public bool convoLoaded { get; private set; }
+		public bool inputAreaDeployed { get; private set; }
 
 
+		private Phone.Controller controller;
 		private List<Conversation> convosInProgress;
+		private float slideDuration = 0.4f;
+		private Vector2 convoAreaHiddenPos, convoAreaVisiblePos;
 
 
 		#region Init and teardown
 
+		void Awake()
+		{
+			convoLoaded = false;
+			inputAreaDeployed = false;
+
+
+			convoAreaHiddenPos = convoRenderingArea.anchoredPosition;
+			convoAreaVisiblePos = new Vector2(convoAreaHiddenPos.x, 0f);
+		}
+		
+		
+		void OnEnable()
+		{
+			Phone.HotCorner.OnBack += GoBack;
+		}
+
+
+		void OnDisable()
+		{
+			Phone.HotCorner.OnBack -= GoBack;
+		}
+
+
 		void Start()
 		{
+			controller = GetComponentInParent<Phone.Controller>();
+
+
 			if (buildFromSaveFile)
 				PopulateApp();
 		}
@@ -64,7 +102,7 @@ namespace Texts
 
 
 				// Set it to be the child of the TextsApp.
-				activeConvoBuilders[i].transform.SetParent(transform, false);
+				activeConvoBuilders[i].transform.SetParent(convoHolder.transform, false);
 
 
 				// Build it with the instructions on the save file.
@@ -101,7 +139,184 @@ namespace Texts
 
 		public void LoadConversation(Character.ID contact)
 		{
-			// TODO!!
+			if (controller.AllowingInput)
+				StartCoroutine(CoLoadConvo(contact));
+		}
+
+
+		IEnumerator CoLoadConvo(Character.ID contact)
+		{
+			if (OnAnimStart != null)
+				OnAnimStart();
+
+
+			// Get the signpost text switching to the nickname of the contact.
+			signpostText.SwitchToCharacter(contact);
+
+
+			// Calculate the iterations to slide the conversation into place.
+			int iterations = GetSlideIterations();
+
+
+			// Find the end position.
+			Vector2 endPos = new Vector2(0f, convoHolder.anchoredPosition.y);
+
+			
+			// Turn off all conversations except for the one we want.
+			for (int i = 0; i < activeConvoBuilders.Length; i++)
+			{
+				if (activeConvoBuilders[i].characterID == contact)
+					activeConvoBuilders[i].gameObject.SetActive(true);
+				else
+					activeConvoBuilders[i].gameObject.SetActive(false);
+			}
+
+
+			// Slide the conversation holder into place.
+			for (int i = 0; i < iterations; i++)
+			{
+				convoHolder.anchoredPosition = Vector2.Lerp(convoHolder.anchoredPosition, endPos, 0.25f);
+				yield return new WaitForFixedUpdate();
+			}
+
+
+			// Make sure that the conversation holder reaches its final position.
+			convoHolder.anchoredPosition = endPos;
+
+
+			convoLoaded = true;
+			if (OnAnimEnd != null)
+				OnAnimEnd();
+
+
+			yield return null;
+		}
+
+
+		public void UnloadConversation()
+		{
+			if (controller.AllowingInput)
+				StartCoroutine(CoUnloadConvo());
+		}
+
+
+		IEnumerator CoUnloadConvo()
+		{
+			if (OnAnimStart != null)
+				OnAnimStart();
+
+
+			// Get the signpost text switching back to its default title.
+			signpostText.Reset();
+
+
+			// Calculate the iterations.
+			int iterations = GetSlideIterations();
+
+
+			// Find the end position for the transition.
+			Vector2 endPos = new Vector2(convoHolder.sizeDelta.x, convoHolder.anchoredPosition.y);
+
+
+			// Slide the conversation holder.
+			for (int i = 0; i < iterations; i++)
+			{
+				convoHolder.anchoredPosition = Vector2.Lerp(convoHolder.anchoredPosition, endPos, 0.25f);
+				yield return new WaitForFixedUpdate();
+			}
+
+
+			// Make sure the conversation holder reaches the final position.
+			convoHolder.anchoredPosition = endPos;
+
+
+			convoLoaded = false;
+			if (OnAnimEnd != null)
+				OnAnimEnd();
+
+
+			yield return null;
+		}
+		#endregion
+
+
+		#region Deploying text input area
+
+		public void PressNewText()
+		{
+			if (controller.AllowingInput)
+			{
+				StopAllCoroutines();
+
+
+				if (convoLoaded && !inputAreaDeployed)
+				{
+					StartCoroutine(CoToggleInputArea(true));
+				}
+				else
+				{
+					// StartCoroutine(CoShowMessageCreationScreen());
+				}
+			}
+		}
+
+
+		public void PressTextMessage(TextMessageButton button)
+		{
+			if (controller.AllowingInput)
+			{
+				if (inputAreaDeployed)
+					StartCoroutine(CoToggleInputArea(false));
+			}
+		}
+
+
+		IEnumerator CoToggleInputArea(bool shouldDeploy)
+		{
+			if (OnAnimStart != null)
+				OnAnimStart();
+
+
+			Vector2 targetPos = shouldDeploy ? convoAreaVisiblePos : convoAreaHiddenPos;
+
+
+			int iterations = GetSlideIterations();
+
+
+			for (int i = 0; i < iterations; i++)
+			{
+				convoRenderingArea.anchoredPosition = Vector2.Lerp(convoRenderingArea.anchoredPosition, targetPos, 0.25f);
+				yield return new WaitForFixedUpdate();
+			}
+
+
+			convoRenderingArea.anchoredPosition = targetPos;
+
+
+			inputAreaDeployed = shouldDeploy;
+			if (OnAnimEnd != null)
+				OnAnimEnd();
+		}
+		#endregion
+
+
+		#region HotCorner events
+
+		public void GoBack()
+		{
+			if (controller.AllowingInput)
+			{
+				if (convoLoaded)
+				{
+					if (inputAreaDeployed)
+						StartCoroutine(CoToggleInputArea(false));
+					else
+						UnloadConversation();
+				}
+				
+				// TODO: else, go back to the home screen.
+				// Also check that we are not waiting for a response from the player.
+			}
 		}
 		#endregion
 
@@ -140,6 +355,15 @@ namespace Texts
 		protected override void UpdateSaveFile()
 		{
 			SaveManager.Current.saveFile.conversations = GetConvosInProgress();
+		}
+		#endregion
+
+
+		#region Utilities
+
+		int GetSlideIterations()
+		{
+			return (int)(slideDuration / Time.fixedDeltaTime);
 		}
 		#endregion
 	}
