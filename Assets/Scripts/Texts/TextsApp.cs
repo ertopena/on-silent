@@ -28,6 +28,8 @@ namespace Texts
 		private List<Conversation> convosInProgress;
 		private float slideDuration = 0.4f;
 		private Vector2 convoAreaHiddenPos, convoAreaVisiblePos;
+		//Turn these on in Awake() and CoToggleInputArea(bool shouldDeploy)
+		private Vector2 convoHolderFullSize, convoHolderSizeWithKeyboard;
 
 
 		#region Init and teardown
@@ -40,6 +42,9 @@ namespace Texts
 
 			convoAreaHiddenPos = convoRenderingArea.anchoredPosition;
 			convoAreaVisiblePos = new Vector2(convoAreaHiddenPos.x, 0f);
+
+			convoHolderFullSize = convoHolder.sizeDelta;
+			convoHolderSizeWithKeyboard = new Vector2(convoHolderFullSize.x, 310f);
 		}
 		
 		
@@ -277,7 +282,11 @@ namespace Texts
 				OnAnimStart();
 
 
+			contactScrollView.gameObject.SetActive(false);
+
+
 			Vector2 targetPos = shouldDeploy ? convoAreaVisiblePos : convoAreaHiddenPos;
+			Vector2 targetSize = shouldDeploy ? convoHolderSizeWithKeyboard : convoHolderFullSize;
 
 
 			int iterations = GetSlideIterations();
@@ -286,11 +295,16 @@ namespace Texts
 			for (int i = 0; i < iterations; i++)
 			{
 				convoRenderingArea.anchoredPosition = Vector2.Lerp(convoRenderingArea.anchoredPosition, targetPos, 0.25f);
+				convoHolder.sizeDelta = Vector2.Lerp(convoHolder.sizeDelta, targetSize, 0.3f);
 				yield return new WaitForFixedUpdate();
 			}
 
 
 			convoRenderingArea.anchoredPosition = targetPos;
+			convoHolder.sizeDelta = targetSize;
+
+
+			contactScrollView.gameObject.SetActive(true);
 
 
 			inputAreaDeployed = shouldDeploy;
